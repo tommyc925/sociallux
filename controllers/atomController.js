@@ -1,14 +1,20 @@
 import Atom from "../models/atom.js";
 
-export const createAtom = async (req, res) => {
+// CREATE ATOM
+export async function createAtom(req, res) {
   try {
-    const atom = new Atom();
-    await atom.save();
-    res.status(201).json(atom);
-  } catch (error) {
-    res.status(400).json({ error: error.message });
+    const atom = await Atom.create(req.body);
+    return res.status(201).json(atom);
+  } catch (err) {
+    const isValidation = err?.name === "ValidationError";
+    return res.status(isValidation ? 400 : 500).json({
+      error: {
+        code: isValidation ? "validation_error" : "server_error",
+        message: err.message || "Unexpected error",
+      },
+    });
   }
-};
+}
 
 export const getAtoms = async (req, res) => {
   try {

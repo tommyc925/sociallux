@@ -110,29 +110,30 @@ AtomSchema.index({ "values.vid": 1 });
 
 // Ensure vids are unique within the Atom and assign defaults
 AtomSchema.pre("validate", function (next) {
+  // Ensure meta exists
+  if (!this.meta) this.meta = { nextVid: 0 };
+
   const seen = new Set();
-  let bumpNext = false;
 
-  // assign missing order to current index (stable default)
-  this.values.forEach((v, i) => {
+  // Assign defaults and enforce uniqueness
+  for (let i = 0; i < this.values.length; i++) {
+    const v = this.values[i];
+
+    // default display order
     if (typeof v.order !== "number") v.order = i;
-  });
 
-  // 1) ensure/assign vid
-  for (const v of this.values) {
+    // assign local vid if missing
     if (typeof v.vid !== "number") {
-      v.vid = this.meta?.nextVid ?? 0;
-      this.meta = this.meta || {};
-      this.meta.nextVid = (this.meta.nextVid ?? 0) + 1;
-      bumpNext = true;
+      v.vid = this.meta.nextVid++;
     }
-    if (seen.has(v.vid))
+
+    if (seen.has(v.vid)) {
       return next(new Error(`Duplicate vid ${v.vid} in values[]`));
+    }
     seen.add(v.vid);
   }
 
-  // 2) if user manually provided a larger vid, advance nextVid so we don't reuse
-  if (!this.meta) this.meta = { nextVid: 0 };
+  // If user provided a larger vid manually, advance nextVid so we don't reuse
   const maxVid = this.values.reduce((m, v) => Math.max(m, v.vid), -1);
   if (maxVid + 1 > this.meta.nextVid) this.meta.nextVid = maxVid + 1;
 
