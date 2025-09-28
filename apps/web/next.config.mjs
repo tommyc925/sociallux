@@ -6,4 +6,10 @@ const nextConfig = {
     ];
   },
 };
+
+module.exports = {
+  outputFileTracingRoot: __dirname,
+  // ...o
+};
+
 export default nextConfig;
