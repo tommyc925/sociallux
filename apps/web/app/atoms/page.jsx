@@ -43,7 +43,7 @@ export default function AtomsPage() {
                 }}
               >
                 <div>
-                  <strong>{a.name || "(no name)"}</strong>
+                  <strong>{a.title || a.name || "(no title)"}</strong>
                 </div>
                 <div style={{ fontSize: 12, opacity: 0.7 }}>{a._id || ""}</div>
               </li>
