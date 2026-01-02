@@ -6,6 +6,9 @@ node_modules/
 # testing
 coverage/
 
+# Next build artifacts
+apps/web/.next
+
 # production
 build/
 dist/
